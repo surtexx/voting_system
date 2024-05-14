@@ -1,12 +1,9 @@
-const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("VotingSystem Contract", function () {
     let votingTest;
     let voting;
     let owner;
-    let addr1;
-    let addr2;
 
     beforeEach(async function () {
         [owner, addr1, addr2] = await ethers.getSigners();
