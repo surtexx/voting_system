@@ -1,10 +1,13 @@
+require("@nomiclabs/hardhat-ethers");
+const { ethers } = require("hardhat");
+
 async function main() {
-    const [deployer] = await ethers.getSigners();
+    const [deployer, user1] = await ethers.getSigners();
 
     console.log("Deploying contracts with the account:", deployer.address);
 
-    const VotingSystem = await ethers.getContractFactory("VotingSystem");
-    const votingSystem = await VotingSystem.deploy();
+    let VotingSystem = await ethers.getContractFactory("VotingSystem");
+    let votingSystem = await VotingSystem.deploy();
 
     await votingSystem.deployed();
 

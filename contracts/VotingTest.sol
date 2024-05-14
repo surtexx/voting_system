@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Voting.sol";
+import "./VotingSystem.sol";
 
 contract TestVoting {
     VotingSystem public votingSystem;
