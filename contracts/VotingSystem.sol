@@ -2,74 +2,82 @@
 pragma solidity ^0.8.0;
 
 contract VotingSystem {
-    // Struct to represent a candidate
     struct Candidate {
         string name;
         uint256 voteCount;
     }
-    
-    // Mapping to store candidates
-    mapping(address => Candidate) private candidates;
-    
-    // Array of candidate addresses for iteration
-    address[] private candidateAddresses;
-    
-    // Mapping to store voters and their voted candidate
-    mapping(address => address) private voters;
-    
+
+    Candidate[] public candidates;
+    mapping(address => string) public voters;
+    address owner;
+
+    uint256 public votingStart;
+    uint256 public votingEnd;
+
     // Event for when a vote is cast
-    event VoteCast(address indexed voter, address indexed candidate);
-    
-    // Modifier to check if the sender is a registered candidate
-    modifier onlyCandidate() {
-        bool registered = false;
-        for (uint256 i = 0; i < candidateAddresses.length; i++) {
-            if (candidateAddresses[i] == msg.sender) {
-                registered = true;
-                break;
-            }
+    event VoteCast(address indexed voter, string indexed candidateName);
+
+    constructor(string[] memory _candidateNames, uint256 _duration) {
+        for (uint256 i = 0; i < _candidateNames.length; i++) {
+            Candidate memory newCandidate = Candidate({
+                name: _candidateNames[i],
+                voteCount: 0
+            });
+            candidates.push(newCandidate);
         }
-        require(!registered, "You are already registered as a candidate.");
+
+        owner = msg.sender;
+        votingStart = block.timestamp;
+        votingEnd = block.timestamp + (_duration * 1 minutes);
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
         _;
     }
-    
-    // Function to register as a candidate
-    function registerAsCandidate(string memory _name) external onlyCandidate{
-        candidates[msg.sender] = Candidate(_name, 0);
-        candidateAddresses.push(msg.sender);
+
+    function addCandidate(string memory _name) public onlyOwner {
+        Candidate memory newCandidate = Candidate({
+            name: _name,
+            voteCount: 0
+        });
+        candidates.push(newCandidate);
     }
-    
-    // Function to cast a vote
-    function vote(address _candidate) external {
-        require(voters[msg.sender] == address(0), "You have already voted.");
-        require(candidates[_candidate].voteCount >= 0, "Invalid candidate.");
-        
-        voters[msg.sender] = _candidate;
-        candidates[_candidate].voteCount++;
-        
-        emit VoteCast(msg.sender, _candidate);
+
+    function vote(uint256 _index) public {
+        require(bytes(voters[msg.sender]).length == 0, "You have already voted.");
+        require(_index < candidates.length && _index >=0, "Invalid candidate.");
+
+        candidates[_index].voteCount++;
+        voters[msg.sender] = candidates[_index].name;
+
+        emit VoteCast(msg.sender, candidates[_index].name);
     }
-    
-    // Function to get total number of candidates
-    function getTotalCandidates() external view returns (uint256) {
-        return candidateAddresses.length;
+
+    function getAllVotesOfCandidates() public view returns (Candidate[] memory){
+        return candidates;
     }
-    
-    // Function to get total votes for a candidate
-    function getVotesForCandidate(address _candidate) external view returns (uint256) {
-        return candidates[_candidate].voteCount;
+
+    function getVotingStatus() public view returns (bool) {
+        return (block.timestamp >= votingStart && block.timestamp < votingEnd);
     }
-    
-    // Function to get name of a candidate
-    function getCandidateName(address _candidate) external view returns (string memory) {
-        return candidates[_candidate].name;
+
+    function getRemainingTime() public view returns (uint256) {
+        require(block.timestamp >= votingStart, "Voting has not started yet.");
+        if (block.timestamp >= votingEnd) {
+            return 0;
     }
-    
-    // Function to transfer ETH
+        return votingEnd - block.timestamp;
+    }
+
     function transferETH(address payable _to, uint256 _amount) external {
         require(_to != address(0), "Invalid recipient address");
         require(address(this).balance >= _amount, "Insufficient balance");
         
         _to.transfer(_amount);
+    }
+
+    function checkBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 }

@@ -1,69 +1,105 @@
 require("@nomiclabs/hardhat-ethers");
 const { ethers } = require("hardhat");
 
-async function registerCandidate(candidateName) {
-    [owner, user1] = await ethers.getSigners();
+async function addCandidate(name) {
+    owner = await ethers.getSigners();
 
-    let votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress)
+    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
-    const registerTransaction = await votingSystem.connect(user1).registerAsCandidate(candidateName);
-    await registerTransaction.wait();
-
-    console.log("Candidate:", user1.address)
+    try {
+        const tx = await votingSystem.addCandidate(name);
+        await tx.wait();
+        console.log(`Candidate ${name} added successfully.`);
+    } catch (error) {
+        console.error(`Failed to add candidate: ${error}`);
+    }
 }
 
-async function castVote(candidateAddress) {
-    [owner, user1] = await ethers.getSigners();
+async function vote(candidateIndex) {
+    owner = await ethers.getSigners();
 
-    let votinSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votinSystemAddress)
+    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
-    const voteTransaction = await votingSystem.connect(user1).vote(candidateAddress);
-    await voteTransaction.wait();
-
-    console.log("Vote cast.");
+    try {
+        const tx = await votingSystem.vote(candidateIndex);
+        await tx.wait();
+        console.log(`Voted for candidate at index ${candidateIndex}.`);
+    } catch (error) {
+        console.error(`Failed to vote: ${error}`);
+    }
 }
 
-async function getTotalCandidates() {
-    [owner, user1] = await ethers.getSigners();
+async function getAllVotesOfCandidates() {
+    owner = await ethers.getSigners();
 
-    let votinSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votinSystemAddress)
+    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
-    const totalCandidates = await votingSystem.connect(user1).getTotalCandidates();
-    console.log("Total number of candidates:", totalCandidates.toNumber());
+    try {
+        const candidates = await votingSystem.getAllVotesOfCandidates();
+        console.log("Candidates and their votes:");
+        candidates.forEach((candidate, index) => {
+            console.log(`Candidate ${index}: ${candidate.name}, Votes: ${candidate.voteCount}`);
+        });
+    } catch (error) {
+        console.error(`Failed to get votes: ${error}`);
+    }
 }
 
-async function getVotesForCandidate(candidateAddress) {
-    [owner, user1] = await ethers.getSigners();
+async function getVotingStatus() {
+    owner = await ethers.getSigners();
 
-    let votinSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votinSystemAddress)
+    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
-    const votes = await votingSystem.connect(user1).getVotesForCandidate(candidateAddress);
-    console.log("Votes for candidate:", votes.toNumber());
+    try {
+        const status = await votingSystem.getVotingStatus();
+        console.log(`Voting is currently ${status ? "open" : "closed"}.`);
+    } catch (error) {
+        console.error(`Failed to get voting status: ${error}`);
+    }
 }
 
-async function getCandidateName(candidateAddress) {
-    [owner, user1] = await ethers.getSigners();
+async function getRemainingTime() {
+    owner = await ethers.getSigners();
 
-    let votinSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votinSystemAddress)
+    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
-    const candidateName = await votingSystem.connect(user1).getCandidateName(candidateAddress);
-    console.log("Name of candidate:", candidateName);
+    try {
+        const remainingTime = await votingSystem.getRemainingTime();
+        console.log(`Remaining voting time: ${remainingTime} seconds.`);
+    } catch (error) {
+        console.error(`Failed to get remaining time: ${error}`);
+    }
 }
 
-async function transferEthToContract(contractAddress, amount) {
-    [owner, user1] = await ethers.getSigners();
-
-    let votinSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-    let votingSystem = await ethers.getContractAt("VotingSystem", votinSystemAddress)
-
-    const ethAmount = ethers.utils.parseEther(amount);
-    const transferTransaction = await votingSystem.connect(user1).transferETH(contractAddress, ethAmount);
-    await transferTransaction.wait();
-
-    console.log("ETH transferred to contract.");
+async function transferETH(to, amount) {
+    try {
+        const tx = await votingSystem.transferETH(to, ethers.utils.parseEther(amount));
+        await tx.wait();
+        console.log(`Transferred ${amount} ETH to ${to}.`);
+    } catch (error) {
+        console.error(`Failed to transfer ETH: ${error}`);
+    }
 }
+
+async function getBalance() {
+    try {
+        const balance = await votingSystem.getBalance();
+        console.log(`Contract balance: ${ethers.utils.formatEther(balance)} ETH.`);
+    } catch (error) {
+        console.error(`Failed to get balance: ${error}`);
+    }
+}
+
+// Example usage
+// (async () => {
+//     await addCandidate("Candidate 3");
+//     await vote(0);
+//     await getAllVotesOfCandidates();
+//     await getVotingStatus();
+//     await getRemainingTime();
+// })();

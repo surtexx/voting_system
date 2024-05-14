@@ -3,28 +3,33 @@ pragma solidity ^0.8.0;
 
 import "./VotingSystem.sol";
 
-contract TestVoting {
+contract VotingTest {
     VotingSystem public votingSystem;
 
-    constructor(VotingSystem _votingSystem) {
-        votingSystem = _votingSystem;
+    struct Candidate {
+        string name;
+        uint256 voteCount;
     }
 
-    function testVotingSystem() public {
-        votingSystem.registerAsCandidate("Candidate 1");
-        
-        votingSystem.vote(address(this));
+    constructor() {
+        string[] memory candidates = new string[](2);
+        candidates[0] = "Alice";
+        candidates[1] = "Bob";
+        votingSystem = new VotingSystem(candidates, 1);
+    }
+    function testAddCandidate(string memory _name) public {
+        votingSystem.addCandidate(_name);
+        require(votingSystem.getAllVotesOfCandidates().length == 3, "Candidate not added.");
+    }
 
-        // Get total number of candidates
-        uint256 totalCandidates = votingSystem.getTotalCandidates();
-        require(totalCandidates == 1, "Incorrect number of candidates");
+    function testVote(uint256 _index) public {
+        votingSystem.vote(_index);
+        VotingSystem.Candidate[] memory votes = votingSystem.getAllVotesOfCandidates();
+        require(votes[_index].voteCount == 1, "Vote not casted.");
+    }
 
-        // Get total votes for a candidate
-        uint256 votesForCandidate1 = votingSystem.getVotesForCandidate(address(this));
-        require(votesForCandidate1 == 1, "Incorrect number of votes");
-
-        // Get name of a candidate
-        string memory name = votingSystem.getCandidateName(address(this));
-        require(keccak256(abi.encodePacked(name)) == keccak256(abi.encodePacked("Candidate 1")), "Incorrect candidate name.");
+    function testGetVotingStatus() public view {
+        bool status = votingSystem.getVotingStatus();
+        require(status == true, "Voting status not fetched.");
     }
 }
