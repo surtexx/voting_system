@@ -1,10 +1,11 @@
 require("@nomiclabs/hardhat-ethers");
 const { ethers } = require("hardhat");
 
+const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
 async function addCandidate(name) {
     owner = await ethers.getSigners();
 
-    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
     try {
@@ -19,7 +20,6 @@ async function addCandidate(name) {
 async function vote(candidateIndex) {
     owner = await ethers.getSigners();
 
-    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
     try {
@@ -34,7 +34,6 @@ async function vote(candidateIndex) {
 async function getAllVotesOfCandidates() {
     owner = await ethers.getSigners();
 
-    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
     try {
@@ -51,7 +50,6 @@ async function getAllVotesOfCandidates() {
 async function getVotingStatus() {
     owner = await ethers.getSigners();
 
-    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
     try {
@@ -65,7 +63,6 @@ async function getVotingStatus() {
 async function getRemainingTime() {
     owner = await ethers.getSigners();
 
-    const votingSystemAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
 
     try {
@@ -77,6 +74,9 @@ async function getRemainingTime() {
 }
 
 async function transferETH(to, amount) {
+    owner = await ethers.getSigners();
+
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
     try {
         const tx = await votingSystem.transferETH(to, ethers.utils.parseEther(amount));
         await tx.wait();
@@ -87,6 +87,9 @@ async function transferETH(to, amount) {
 }
 
 async function getBalance() {
+    owner = await ethers.getSigners();
+
+    let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
     try {
         const balance = await votingSystem.getBalance();
         console.log(`Contract balance: ${ethers.utils.formatEther(balance)} ETH.`);
