@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Voting System</h1>
+    <div>
+        <h2>Add Candidate</h2>
+        <input type="text" id="candidateName" placeholder="Candidate Name">
+        <button onclick="addCandidate()">Add Candidate</button>
+        <div id="addCandidateMessage"></div>
+    </div>
+    <div>
+        <h2>Vote</h2>
+        <input type="number" id="candidateIndex" placeholder="Candidate Index">
+        <button onclick="vote()">Vote</button>
+    </div>
+    <div>
+        <h2>All Votes</h2>
+        <button onclick="getAllVotes()">Get All Votes</button>
+        <pre id="votesOutput"></pre>
+    </div>
+    <div>
+        <h2>Voting Status</h2>
+        <button onclick="getVotingStatus()">Get Voting Status</button>
+        <pre id="statusOutput"></pre>
+    </div>
+    <div>
+        <h2>Remaining Time</h2>
+        <button onclick="getRemainingTime()">Get Remaining Time</button>
+        <pre id="timeOutput"></pre>
+    </div>
+    <div>
+        <h2>Transfer ETH</h2>
+        <input type="text" id="transferTo" placeholder="Recipient Address">
+        <input type="text" id="transferAmount" placeholder="Amount in ETH">
+        <button onclick="transferETH()">Transfer ETH</button>
+    </div>
+    <div>
+        <h2>Contract Balance</h2>
+        <button onclick="getBalance()">Get Balance</button>
+        <pre id="balanceOutput"></pre>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
