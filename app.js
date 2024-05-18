@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { run } = require('hardhat');
+const interact = require('./scripts/interact');
 
 const app = express();
 const port = 3000;
@@ -13,69 +13,77 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-app.post('/api/getVotingStatus', async (req, res) => {
+app.get('/api/getVotingStatus', async (req, res) => {
     try {
-        const status = await run('get-voting-status');
-        res.json({ "status": status });
+        const status = await interact.getVotingStatus();
+        res.json({ status: status });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to get voting status' });
+        res.status(500).json({ error: 'Failed to get voting status:', error });
     }
 });
 
 app.get('/api/getAllVotesOfCandidates', async (req, res) => {
     try {
-        await run('get-all-votes');
-        res.json({ message: 'Votes fetched successfully' });
+        let votes = await interact.getAllVotesOfCandidates();
+        votes = votes.map(vote => {
+            return {
+                name: vote.name.toString(),
+                voteCount: Number(vote.voteCount)
+            };
+        });
+        
+        res.json({ votes: votes });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to get candidates' });
+        res.status(500).json({ error: 'Failed to get candidates: '+ error.message });
     }
 });
 
 app.post('/api/addCandidate', async (req, res) => {
     const { name } = req.body;
     try {
-        await run('add-candidate', { name });
+        await interact.addCandidate(name);
         res.json({ message: `Candidate ${name} added successfully.` });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to add candidate' });
+        res.status(500).json({ error: 'Failed to add candidate: '+ error.message });
     }
 });
 
 app.post('/api/vote', async (req, res) => {
     const { index } = req.body;
     try {
-        await run('vote', { index });
+        await interact.vote(index);
         res.json({ message: `Voted for candidate at index ${index}.` });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to vote' });
+        res.status(500).json({ error: 'Failed to vote: ' + error.message });
     }
 });
 
 app.get('/api/getRemainingTime', async (req, res) => {
     try {
-        await run('get-remaining-time');
-        res.json({ message: 'Remaining time fetched successfully' });
+        const remainingTime = Number(await interact.getRemainingTime());
+        res.json({ remainingTime: remainingTime });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to get remaining time' });
+        res.status(500).json({ error: 'Failed to get remaining time: '+ error.message });
     }
 });
 
-app.get('/api/getBalance', async (req, res) => {
+app.get('/api/getBalance/:addr', async (req, res) => {
+    const { addr } = req.params;
     try {
-        await run('get-balance');
-        res.json({ message: 'Balance fetched successfully' });
+        const balance = Number(await interact.getBalance(addr));
+        res.json({ balance: balance });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to get balance' });
+        res.status(500).json({ error: 'Failed to get balance: '+ error.message });
     }
 });
 
 app.post('/api/transferETH', async (req, res) => {
     const { to, amount } = req.body;
     try {
-        await run('transfer-eth', { to, amount });
+        await interact.transferETH(to, amount);
         res.json({ message: `Transferred ${amount} ETH to ${to}.` });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to transfer ETH' });
+        res.status(500).json({ error: 'Failed to transfer ETH: '+ error.message });
     }
 });
 

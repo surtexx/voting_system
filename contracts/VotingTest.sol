@@ -28,7 +28,7 @@ contract VotingTest {
         require(votes[_index].voteCount == 1, "Vote not casted.");
     }
 
-    function testGetVotingStatus() view public {
+    function testGetVotingStatus() public {
         bool status = votingSystem.getVotingStatus();
         require(status == true, "Voting status not fetched.");
     }

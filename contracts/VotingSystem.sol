@@ -7,12 +7,12 @@ contract VotingSystem {
         uint256 voteCount;
     }
 
-    Candidate[] public candidates;
-    mapping(address => string) public voters;
+    Candidate[] candidates;
+    mapping(address => string)  voters;
     address owner;
 
-    uint256 public votingStart;
-    uint256 public votingEnd;
+    uint256 votingStart;
+    uint256 votingEnd;
 
     // Event for when a vote is cast
     event VoteCast(address indexed voter, string indexed candidateName);
@@ -66,18 +66,18 @@ contract VotingSystem {
         require(block.timestamp >= votingStart, "Voting has not started yet.");
         if (block.timestamp >= votingEnd) {
             return 0;
-    }
+        }
         return votingEnd - block.timestamp;
     }
 
-    function transferETH(address payable _to, uint256 _amount) external {
+    function transferETH(address payable _to, uint256 _amount) external payable {
         require(_to != address(0), "Invalid recipient address");
-        require(address(this).balance >= _amount, "Insufficient balance");
+        require(address(msg.sender).balance >= _amount, "Insufficient balance");
         
         _to.transfer(_amount);
     }
 
-    function checkBalance() public view returns (uint256) {
-        return address(this).balance;
+    function checkBalance(address addr) public view returns (uint256) {
+        return addr.balance;
     }
 }
