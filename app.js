@@ -13,10 +13,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-app.get('/api/getVotingStatus', async (req, res) => {
+app.post('/api/getVotingStatus', async (req, res) => {
     try {
-        await run('get-voting-status');
-        res.json({ message: 'Voting status fetched successfully' });
+        const status = await run('get-voting-status');
+        res.json({ "status": status });
     } catch (error) {
         res.status(500).json({ error: 'Failed to get voting status' });
     }

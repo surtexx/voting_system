@@ -1,18 +1,20 @@
 async function getVotingStatus() {
-    try {
+    // try {
         const response = await fetch('/api/getVotingStatus');
         const result = await response.json();
-        document.getElementById('status').innerText = `Voting is currently ${result.status ? "open" : "closed"}.`;
-    } catch (error) {
-        console.error('Error fetching voting status:', error);
-    }
+        // console.log(result)
+        document.getElementById('statusOutput').innerText = `Voting is currently ${result.status ? "open" : "closed"}.`;
+    // } catch (error) {
+        // console.error('Error fetching voting status:', error);
+    // }
 }
 
 async function getAllVotesOfCandidates() {
     try {
         const response = await fetch('/api/getAllVotesOfCandidates');
         const candidates = await response.json();
-        const candidatesList = document.getElementById('candidates');
+        const candidatesList = document.getElementById('votesOutput');
+        console.log(candidates);
         candidatesList.innerHTML = '';
         candidates.forEach((candidate, index) => {
             const listItem = document.createElement('li');
@@ -26,7 +28,6 @@ async function getAllVotesOfCandidates() {
 
 async function addCandidate() {
     const name = document.getElementById('candidateName').value;
-    console.log(name);
     try {
         const response = await fetch('/api/addCandidate', {
             method: 'POST',
@@ -59,7 +60,7 @@ async function getRemainingTime() {
     try {
         const response = await fetch('/api/getRemainingTime');
         const result = await response.json();
-        document.getElementById('remainingTime').innerText = `Remaining voting time: ${result.remainingTime} seconds.`;
+        document.getElementById('timeOutput').innerText = `Remaining voting time: ${result.remainingTime} seconds.`;
     } catch (error) {
         console.error('Error fetching remaining time:', error);
     }
@@ -69,7 +70,7 @@ async function getBalance() {
     try {
         const response = await fetch('/api/getBalance');
         const result = await response.json();
-        document.getElementById('balance').innerText = `Contract balance: ${result.balance} ETH.`;
+        document.getElementById('balanceOutput').innerText = `Contract balance: ${result.balance} ETH.`;
     } catch (error) {
         console.error('Error fetching balance:', error);
     }

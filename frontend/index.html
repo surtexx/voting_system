@@ -12,16 +12,17 @@
         <h2>Add Candidate</h2>
         <input type="text" id="candidateName" placeholder="Candidate Name">
         <button onclick="addCandidate()">Add Candidate</button>
-        <div id="addCandidateMessage"></div>
+        <pre id="addCandidateMessage"></pre>
     </div>
     <div>
         <h2>Vote</h2>
         <input type="number" id="candidateIndex" placeholder="Candidate Index">
         <button onclick="vote()">Vote</button>
+        <pre id="voteMessage"></pre>
     </div>
     <div>
         <h2>All Votes</h2>
-        <button onclick="getAllVotes()">Get All Votes</button>
+        <button onclick="getAllVotesOfCandidates()">Get All Votes</button>
         <pre id="votesOutput"></pre>
     </div>
     <div>
@@ -39,6 +40,7 @@
         <input type="text" id="transferTo" placeholder="Recipient Address">
         <input type="text" id="transferAmount" placeholder="Amount in ETH">
         <button onclick="transferETH()">Transfer ETH</button>
+        <pre id="transferMessage"></pre>
     </div>
     <div>
         <h2>Contract Balance</h2>

@@ -38,10 +38,8 @@ async function getAllVotesOfCandidates() {
 
     try {
         const candidates = await votingSystem.getAllVotesOfCandidates();
-        console.log("Candidates and their votes:");
-        candidates.forEach((candidate, index) => {
-            console.log(`Candidate ${index}: ${candidate.name}, Votes: ${candidate.voteCount}`);
-        });
+        console.log(candidates)
+        return candidates;
     } catch (error) {
         console.error(`Failed to get votes: ${error}`);
     }
@@ -55,6 +53,7 @@ async function getVotingStatus() {
     try {
         const status = await votingSystem.getVotingStatus();
         console.log(`Voting is currently ${status ? "open" : "closed"}.`);
+        return status;
     } catch (error) {
         console.error(`Failed to get voting status: ${error}`);
     }
@@ -68,6 +67,7 @@ async function getRemainingTime() {
     try {
         const remainingTime = await votingSystem.getRemainingTime();
         console.log(`Remaining voting time: ${remainingTime} seconds.`);
+        return remainingTime;
     } catch (error) {
         console.error(`Failed to get remaining time: ${error}`);
     }
@@ -91,12 +91,23 @@ async function getBalance() {
 
     let votingSystem = await ethers.getContractAt("VotingSystem", votingSystemAddress);
     try {
-        const balance = await votingSystem.getBalance();
+        const balance = await votingSystem.checkBalance();
         console.log(`Contract balance: ${ethers.utils.formatEther(balance)} ETH.`);
+        return balance;
     } catch (error) {
         console.error(`Failed to get balance: ${error}`);
     }
 }
+
+module.exports = {
+    addCandidate,
+    vote,
+    getAllVotesOfCandidates,
+    getVotingStatus,
+    getRemainingTime,
+    transferETH,
+    getBalance
+};
 
 // Example usage
 // (async () => {
