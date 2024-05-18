@@ -52,7 +52,7 @@ app.post('/api/vote', async (req, res) => {
     const { index } = req.body;
     try {
         await interact.vote(index);
-        res.json({ message: `Voted for candidate at index ${index}.` });
+        res.json({ message: `Vote registered succesfully.` });
     } catch (error) {
         res.status(500).json({ error: 'Failed to vote: ' + error.message });
     }

@@ -131,12 +131,12 @@ module.exports = {
     getBalance
 };
 
-// Example usage
+// // Example usage
 // (async () => {
-    // await addCandidate("Candidate 3");
-    // await vote(0);
-    // await getAllVotesOfCandidates();
-    // await getVotingStatus();
-    // await getRemainingTime();
-    // await transferETH("0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097", 1);
+//     await addCandidate("Candidate 3");
+//     await vote(0);
+//     await getAllVotesOfCandidates();
+//     await getVotingStatus();
+//     await getRemainingTime();
+//     await transferETH("0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097", 1);
 // })();

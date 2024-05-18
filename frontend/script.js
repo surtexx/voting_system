@@ -38,15 +38,43 @@ async function addCandidate() {
         const result = await response.json();
         if (result.error)
             document.getElementById('addCandidateMessage').innerText = result.error;
-        else
+        else {
             document.getElementById('addCandidateMessage').innerText = result.message;
+            populateCandidates();
+        }
     } catch (error) {
         console.error('Error adding candidate:', error);
     }
 }
 
+async function populateCandidates() {
+    try {
+        const response = await fetch('/api/getAllVotesOfCandidates');
+        const candidates = await response.json();
+        const candidateSelect = document.getElementById('candidateSelect');
+        
+        candidateSelect.innerHTML = '<option value="" disabled selected>Select a candidate</option>'; // Reset options
+        
+        candidates.votes.forEach((candidate, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.innerText = candidate.name;
+            candidateSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching candidates:', error);
+    }
+}
+
 async function vote() {
-    const index = document.getElementById('candidateIndex').value;
+    const select = document.getElementById('candidateSelect');
+    const index = select.value;
+    
+    if (!index) {
+        document.getElementById('voteMessage').innerText = 'Please select a candidate.';
+        return;
+    }
+
     try {
         const response = await fetch('/api/vote', {
             method: 'POST',
@@ -62,6 +90,9 @@ async function vote() {
         console.error('Error voting:', error);
     }
 }
+
+// Call populateCandidates when the page loads
+window.onload = populateCandidates;
 
 async function getRemainingTime() {
     try {
@@ -89,6 +120,7 @@ async function getBalance() {
         console.error('Error fetching balance:', error);
     }
 }
+
 
 async function transferETH() {
     const to = document.getElementById('transferTo').value;

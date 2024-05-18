@@ -16,7 +16,9 @@
     </div>
     <div>
         <h2>Vote</h2>
-        <input type="number" id="candidateIndex" placeholder="Candidate Index">
+        <select id="candidateSelect">
+            <option value="" disabled selected>Select a candidate</option>
+        </select>
         <button onclick="vote()">Vote</button>
         <pre id="voteMessage"></pre>
     </div>
