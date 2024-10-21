@@ -55,13 +55,13 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: false
-          outputs: type=docker,dest=/tmp/image.tar
+          load: true
           tags: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
       - name: Scan for vulnerabilities
         uses: crazy-max/ghaction-container-scan@v3
         with:
-          tarball: /tmp/image.tar
+          image: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+          dockerfile: Dockerfile
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2.1.3
         with:
