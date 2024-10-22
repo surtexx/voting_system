@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+env:
+  GOOGLE_CLUSTER: rgheorghe-cicd-cluster
+  GOOGLE_PROJECT: gd-gcp-gridu-devops-t1-t2
+  GOOGLE_REGION: europe-west1
+  GOOGLE_REPOSITORY: rgheorghe-voting_system
+
 jobs:
   install-dependencies:
     runs-on: ubuntu-latest
@@ -56,11 +62,11 @@ jobs:
         with:
           context: .
           load: true
-          tags: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+          tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
       - name: Scan for vulnerabilities
         uses: crazy-max/ghaction-container-scan@v3
         with:
-          image: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+          image: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
           dockerfile: Dockerfile
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2.1.3
@@ -73,7 +79,7 @@ jobs:
       - name: Login to GAR
         uses: docker/login-action@v3.2.0
         with:
-          registry: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev
+          registry: ${{ env.GOOGLE_REGION }}-docker.pkg.dev
           username: _json_key
           password: ${{ secrets.GOOGLE_CREDENTIALS }}
       - name: Push to GAR
@@ -81,10 +87,21 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
-
-      # - name: Docker publish
-      #   run: |
-      #     gcloud auth configure-docker europe-west1-docker.pkg.dev
-      #     docker build -t europe-west1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest .
-      #     docker push ${{ secrets.GOOGLE_REGION }}-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT }}/${{ secrets.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+          tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.1.3
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy to GKE
+        run: |
+          gcloud container clusters get-credentials ${{ env.GOOGLE_CLUSTER }} --region ${{ env.GOOGLE_REGION }} --project ${{ env.GOOGLE_PROJECT }}
+          kubectl create deployment voting-system --image=${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest --replicas=3
+          kubectl expose deployment voting-system --type=LoadBalancer --port=80 --target-port=80
