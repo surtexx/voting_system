@@ -100,6 +100,11 @@ jobs:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+      - name: Connect to GKE
+        uses: google-github-actions/get-gke-credentials@v0
+        with:
+          cluster_name: ${{ env.GOOGLE_CLUSTER }}
+          location: ${{ env.GOOGLE_REGION }}
       - name: Deploy to GKE
         run: |
           gcloud container clusters get-credentials ${{ env.GOOGLE_CLUSTER }} --region ${{ env.GOOGLE_REGION }} --project ${{ env.GOOGLE_PROJECT }}
