@@ -108,5 +108,6 @@ jobs:
       - name: Deploy to GKE
         run: |
           gcloud components install gke-gcloud-auth-plugin
+          kubectl delete deployment voting-system
           kubectl create deployment voting-system --image=${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest --replicas=3
-          kubectl expose deployment voting-system --type=LoadBalancer --port=80 --target-port=80
+          kubectl expose deployment voting-system --type=LoadBalancer --port=80 --target-port=3000
