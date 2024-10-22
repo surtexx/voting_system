@@ -12,7 +12,7 @@ env:
   GOOGLE_CLUSTER: rgheorghe-cicd-cluster
   GOOGLE_PROJECT: gd-gcp-gridu-devops-t1-t2
   GOOGLE_REGION: europe-west1
-  GOOGLE_REPOSITORY: rgheorghe-voting_system
+  GOOGLE_REPOSITORY: rgheorghe-voting-system
 
 jobs:
   install-dependencies:
