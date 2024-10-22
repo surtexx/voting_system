@@ -61,8 +61,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          load: true
-          tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
+          cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Scan for vulnerabilities
         uses: crazy-max/ghaction-container-scan@v3
         with:
@@ -82,14 +81,25 @@ jobs:
           registry: ${{ env.GOOGLE_REGION }}-docker.pkg.dev
           username: _json_key
           password: ${{ secrets.GOOGLE_CREDENTIALS }}
-      - name: Push to GAR
+      - name: Push to GAR with tag
+        if: github.event_name == 'pull_request'
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:${{ github.sha }}
+      - name: Push to GAR
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          cache-from: type=local,src=/tmp/.buildx-cache
+          push: true
           tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
 
   deploy:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: publish
     steps:
