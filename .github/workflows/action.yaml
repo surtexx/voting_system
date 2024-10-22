@@ -88,7 +88,7 @@ jobs:
           context: .
           push: true
           tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
-  
+
   deploy:
     runs-on: ubuntu-latest
     needs: publish
@@ -107,6 +107,6 @@ jobs:
           location: ${{ env.GOOGLE_REGION }}
       - name: Deploy to GKE
         run: |
-          gcloud container clusters get-credentials ${{ env.GOOGLE_CLUSTER }} --region ${{ env.GOOGLE_REGION }} --project ${{ env.GOOGLE_PROJECT }}
+          gcloud components install gke-gcloud-auth-plugin
           kubectl create deployment voting-system --image=${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest --replicas=3
           kubectl expose deployment voting-system --type=LoadBalancer --port=80 --target-port=80
