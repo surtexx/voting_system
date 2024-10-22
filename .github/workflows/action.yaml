@@ -64,6 +64,7 @@ jobs:
         with:
           context: .
           cache-to: type=local,dest=/tmp/.buildx-cache
+          load: true
           tags: ${{ env.GOOGLE_REGION }}-docker.pkg.dev/${{ env.GOOGLE_PROJECT }}/${{ env.GOOGLE_REPOSITORY }}/${{ github.event.repository.name }}:latest
       - name: Scan for vulnerabilities
         uses: crazy-max/ghaction-container-scan@v3
